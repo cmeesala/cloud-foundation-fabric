@@ -360,3 +360,54 @@ module "cf-http" {
 - [pubsub.tf](../../tests/fixtures/pubsub.tf)
 - [secret-credentials.tf](../../tests/fixtures/secret-credentials.tf)
 <!-- END TFDOC -->
+
+<!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
+## Inputs
+
+| Name | Description | Type | Default | Required |
+|------|-------------|------|---------|:--------:|
+| bucket\_config | Enable and configure auto-created bucket. Set fields to null to use defaults. | <pre>object({<br>    force_destroy             = optional(bool)<br>    lifecycle_delete_age_days = optional(number)<br>    location                  = optional(string)<br>  })</pre> | `null` | no |
+| bucket\_name | Name of the bucket that will be used for the function code. It will be created with prefix prepended if bucket\_config is not null. | `string` | n/a | yes |
+| build\_environment\_variables | A set of key/value environment variable pairs available during build time. | `map(string)` | `{}` | no |
+| build\_service\_account | Build service account email. | `string` | `null` | no |
+| build\_worker\_pool | Build worker pool, in projects/<PROJECT-ID>/locations/<REGION>/workerPools/<POOL\_NAME> format. | `string` | `null` | no |
+| bundle\_config | Cloud function source. Path can point to a GCS object URI, or a local path. A local path to a zip archive will generate a GCS object using its basename, a folder will be zipped and the GCS object name inferred when not specified. | <pre>object({<br>    path = string<br>    folder_options = optional(object({<br>      archive_path = optional(string)<br>      excludes     = optional(list(string))<br>    }), {})<br>  })</pre> | n/a | yes |
+| description | Optional description. | `string` | `"Terraform managed."` | no |
+| docker\_repository\_id | User managed repository created in Artifact Registry. | `string` | `null` | no |
+| environment\_variables | Cloud function environment variables. | `map(string)` | <pre>{<br>  "LOG_EXECUTION_ID": "true"<br>}</pre> | no |
+| function\_config | Cloud function configuration. Defaults to using main as entrypoint, 1 instance with 256MiB of memory, and 180 second timeout. | <pre>object({<br>    binary_authorization_policy = optional(string)<br>    entry_point                 = optional(string, "main")<br>    instance_count              = optional(number, 1)<br>    memory_mb                   = optional(number, 256) # Memory in MB<br>    cpu                         = optional(string, "0.166")<br>    runtime                     = optional(string, "python310")<br>    timeout_seconds             = optional(number, 180)<br>  })</pre> | <pre>{<br>  "cpu": "0.166",<br>  "entry_point": "main",<br>  "instance_count": 1,<br>  "memory_mb": 256,<br>  "runtime": "python310",<br>  "timeout_seconds": 180<br>}</pre> | no |
+| iam | IAM bindings for topic in {ROLE => [MEMBERS]} format. | `map(list(string))` | `{}` | no |
+| ingress\_settings | Control traffic that reaches the cloud function. Allowed values are ALLOW\_ALL, ALLOW\_INTERNAL\_AND\_GCLB and ALLOW\_INTERNAL\_ONLY . | `string` | `null` | no |
+| kms\_key | Resource name of a KMS crypto key (managed by the user) used to encrypt/decrypt function resources in key id format. If specified, you must also provide an artifact registry repository using the docker\_repository\_id field that was created with the same KMS crypto key. | `string` | `null` | no |
+| labels | Resource labels. | `map(string)` | `{}` | no |
+| name | Name used for cloud function and associated resources. | `string` | n/a | yes |
+| prefix | Optional prefix used for resource names. | `string` | `null` | no |
+| project\_id | Project id used for all resources. | `string` | n/a | yes |
+| region | Region used for all resources. | `string` | n/a | yes |
+| secrets | Secret Manager secrets. Key is the variable name or mountpoint, volume versions are in version:path format. | <pre>map(object({<br>    is_volume  = bool<br>    project_id = string<br>    secret     = string<br>    versions   = list(string)<br>  }))</pre> | `{}` | no |
+| service\_account | Service account email. Unused if service account is auto-created. | `string` | `null` | no |
+| service\_account\_create | Auto-create service account. | `bool` | `false` | no |
+| trigger\_config | Function trigger configuration. Leave null for HTTP trigger. | <pre>object({<br>    event_type   = string<br>    pubsub_topic = optional(string)<br>    region       = optional(string)<br>    event_filters = optional(list(object({<br>      attribute = string<br>      value     = string<br>      operator  = optional(string)<br>    })), [])<br>    service_account_email  = optional(string)<br>    service_account_create = optional(bool, false)<br>    retry_policy           = optional(string, "RETRY_POLICY_DO_NOT_RETRY") # default to avoid permadiff<br>  })</pre> | `null` | no |
+| vpc\_connector | VPC connector configuration. Set create to 'true' if a new connector needs to be created. | <pre>object({<br>    create          = optional(bool, false)<br>    name            = optional(string)<br>    egress_settings = optional(string)<br>  })</pre> | `{}` | no |
+| vpc\_connector\_config | VPC connector network configuration. Must be provided if new VPC connector is being created. | <pre>object({<br>    ip_cidr_range = string<br>    network       = string<br>    instances = optional(object({<br>      max = optional(number)<br>      min = optional(number, 2)<br>    }))<br>    throughput = optional(object({<br>      max = optional(number, 300)<br>      min = optional(number, 200)<br>    }))<br>  })</pre> | `null` | no |
+
+## Outputs
+
+| Name | Description |
+|------|-------------|
+| bucket | Bucket resource (only if auto-created). |
+| bucket\_name | Bucket name. |
+| function | Cloud function resources. |
+| function\_name | Cloud function name. |
+| id | Fully qualified function id. |
+| invoke\_command | Command to invoke Cloud Run Function. |
+| service\_account | Service account resource. |
+| service\_account\_email | Service account email. |
+| service\_account\_iam\_email | Service account email. |
+| trigger\_service\_account | Service account resource. |
+| trigger\_service\_account\_email | Service account email. |
+| trigger\_service\_account\_iam\_email | Service account email. |
+| uri | Cloud function service uri. |
+| vpc\_connector | VPC connector resource if created. |
+
+<!-- END OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
